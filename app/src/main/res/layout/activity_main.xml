@@ -8,17 +8,18 @@
     tools:context=".MainActivity"
     android:padding="16dp">
 
-    <TextView
+    <EditText
         android:id="@+id/loc"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:layout_marginRight="16dp"
+        android:inputType="textShortMessage"
+        android:scrollHorizontally="true"
         android:text="Postal code"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textSize="18sp"
         android:textStyle="bold"
-        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView

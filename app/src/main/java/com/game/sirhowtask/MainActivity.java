@@ -81,9 +81,7 @@ public class MainActivity extends AppCompatActivity {
         if (!hasPermissions(this, PERMISSIONS) || isNetworkAvailable()) {
             /**
              * Check if all permissions are still granted.
-             * If not then do not load the map fragment and also display a message, asking user for permissions.
-             * If yes then open map fragment.
-             * */
+             */
 
             if (isNetworkAvailable()) {
                 new AlertDialog
@@ -102,21 +100,11 @@ public class MainActivity extends AppCompatActivity {
                                 if (ActivityCompat.checkSelfPermission(MainActivity.this,
                                         android.Manifest.permission.ACCESS_FINE_LOCATION)
                                         != PackageManager.PERMISSION_GRANTED) {
-//                                    // Should we show an explanation?
-//                                    if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
-//                                            android.Manifest.permission.ACCESS_FINE_LOCATION)) {
-//                                        // Show an explanation to the user *asynchronously* -- don't block
-//                                        // this thread waiting for the user's response! After the user
-//                                        // sees the explanation, try again to request the permission.
-//                                    } else {
-//                                        // No explanation needed, we can request the permission.
-                                        ActivityCompat.requestPermissions(MainActivity.this,
+
+                                    ActivityCompat.requestPermissions(MainActivity.this,
                                                 new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
-//                                        // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-//                                        // app-defined int constant. The callback method gets the
-//                                        // result of the request.
-//                                    }
-                                };
+
+                                }
                             }
                         })
                         .setNegativeButton("No", null)
@@ -138,10 +126,10 @@ public class MainActivity extends AppCompatActivity {
 
                 if (pin == 0) {
                     locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                            1000, 0, locationListener);
+                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+                            0, 0, locationListener);
                 } else {
-                    tv.setText(pin+"");
+                    //tv.setText(pin+"");
                     progressDialog.cancel();
                     searchNearByPlace(pin);
                 }
@@ -164,7 +152,8 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             tv2.setText("Please provide location Permission");
             return;
         }
@@ -176,17 +165,13 @@ public class MainActivity extends AppCompatActivity {
             progressDialog.show();
         }
 
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
                 0, 0, locationListener);
-
 
     }
 
     private void searchNearByPlace(int pin) {
-//        locationManager.removeUpdates(locationListener);
-//        locationManager = null;
 
-        //201301
         adapter = new HotelAdapter(MainActivity.this, hm.get(pin+""));
         hotels.setAdapter(adapter);
 
@@ -196,20 +181,22 @@ public class MainActivity extends AppCompatActivity {
     private int getAreaPin(double latitude, double longitude) {
         locationManager.removeUpdates(locationListener);
         locationManager = null;
+
         Geocoder geoCoder = new Geocoder(MainActivity.this, Locale.getDefault());
-        List<Address> matches = null;
+        List<Address> addresses = null;
         int x = 0;
         try {
-            matches = geoCoder.getFromLocation(latitude, longitude, 1);
-            if(matches == null)
+            addresses = geoCoder.getFromLocation(latitude, longitude, 1);
+            if(addresses == null)
                 return 0;
 
-            Log.e("Address", matches + "");
+            Log.e("Address", addresses + "");
 
-            String toCut = matches.get(0).getPostalCode();
-            Log.e("toCut", toCut);
+            tv.setText(addresses.get(0).getAddressLine(0));
+            String pin = addresses.get(0).getPostalCode();
+            Log.e("toCut", pin);
 
-            x = Integer.parseInt(toCut.trim());
+            x = Integer.parseInt(pin.trim());
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -225,10 +212,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static boolean hasPermissions(Context context, String... permissions) {
-        /**
-         * Checks if the user has specified the required permissions.
-         * @return boolean variable. True if all permissions already provided. False if not.
-         */
+
         if (context != null && permissions != null) {
             for (String permission : permissions) {
                 if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
@@ -248,14 +232,16 @@ public class MainActivity extends AppCompatActivity {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // permission was granted, yay! Do the
-                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                            1000, 0, locationListener);
+
+                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+                            0, 0, locationListener);
+
                     progressDialog = ProgressDialog.show(MainActivity.this, "",
                             "Finding your location", false);
                     progressDialog.setCancelable(false);
                     progressDialog.show();
                     tv2.setText("");
+
                     Toast.makeText(getApplicationContext(), "Permission granted", Toast.LENGTH_SHORT).show();
 
                 } else {
@@ -265,8 +251,6 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            // other 'case' lines to check for other
-            // permissions this app might request
         }
     }
 }
