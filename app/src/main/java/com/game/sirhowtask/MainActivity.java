@@ -34,7 +34,6 @@ public class MainActivity extends AppCompatActivity {
 
     LocationManager locationManager;
     protected LocationListener locationListener;
-    protected boolean gps_enabled, network_enabled;
     public static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     String[] PERMISSIONS = {
             Manifest.permission.INTERNET,
@@ -42,12 +41,11 @@ public class MainActivity extends AppCompatActivity {
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.INTERNET,
             Manifest.permission.ACCESS_NETWORK_STATE
-
     };
     HashMap<String, ArrayList<String>> hm;
-    int PERMISSION_ALL = 1;
     private TextView tv, tv2;
     private GridView hotels;
+    int minTime = 1000;
     ListAdapter adapter;
     ProgressDialog progressDialog;
 
@@ -127,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
                 if (pin == 0) {
                     locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
                     locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
-                            0, 0, locationListener);
+                            minTime, 0, locationListener);
                 } else {
                     //tv.setText(pin+"");
                     progressDialog.cancel();
@@ -166,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
-                0, 0, locationListener);
+                minTime, 0, locationListener);
 
     }
 
@@ -176,7 +174,6 @@ public class MainActivity extends AppCompatActivity {
         hotels.setAdapter(adapter);
 
     }
-
 
     private int getAreaPin(double latitude, double longitude) {
         locationManager.removeUpdates(locationListener);
@@ -234,7 +231,7 @@ public class MainActivity extends AppCompatActivity {
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
                     locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
-                            0, 0, locationListener);
+                            minTime, 0, locationListener);
 
                     progressDialog = ProgressDialog.show(MainActivity.this, "",
                             "Finding your location", false);
